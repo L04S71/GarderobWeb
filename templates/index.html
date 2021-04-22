@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Мой гардероб</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      #filter {
+        margin: 20px 0;
+      }
+      body {
+        background-image: url('/static/background.jpg');
+        background-size: cover;
+        background-attachment: fixed;
+        padding-top: 60px;
+      }
+      .btn-group {
+        background-color: whitesmoke;
+      }
+      .catalog-item {
+        margin-bottom: 30px;
+      }
+      .card img {
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="/">Каталог одежды</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div id="filter">
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          {% for season in seasons %}
+
+          <label class="btn btn-outline-primary active">
+            <input
+              type="checkbox"
+              id="season_filter_{{season.ID}}"
+              data-id="{{season.ID}}"
+              class="filter_season"
+            />
+            {{season.Name_Season}}
+          </label>
+
+          {% endfor %}
+        </div>
+
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label class="btn btn-outline-primary active">
+            <input
+              type="checkbox"
+              id="gender_filter_male"
+              class="filter_gender"
+              data-id="мужской"
+            />
+            Мужская
+          </label>
+
+          <label class="btn btn-outline-primary active">
+            <input
+              type="checkbox"
+              id="gender_filter_female"
+              data-id="женская"
+              class="filter_gender"
+            />
+            Женский
+          </label>
+        </div>
+      </div>
+
+      <div id="catalog"></div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"
+      integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      function refresh() {
+        var filter = {
+          seasons: $('.filter_season:checkbox:checked')
+            .map(function () {
+              return $(this).data('id');
+            })
+            .get(),
+          genders: $('.filter_gender:checkbox:checked')
+            .map(function () {
+              return $(this).data('id');
+            })
+            .get(),
+        };
+        $('#catalog').load('/catalog?' + $.param(filter));
+      }
+
+      $(document).ready(function () {
+        $(document).on('click', '.filter_season', refresh);
+        $(document).on('click', '.filter_gender', refresh);
+
+        refresh();
+      });
+    </script>
+  </body>
+</html>
