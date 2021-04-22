@@ -41,8 +41,26 @@
         margin-right: 5px;
         text-transform: capitalize;
       }
+      .cart-del {
+        position: absolute;
+        top: 3px;
+        right: 3px;
+        visibility: hidden;
+      }
+      .card {
+        width: 100%;
+        position: relative;
+      }
+      .card:hover .cart-del {
+        visibility: visible;
+      }
       .card img {
         height: 300px;
+      }
+      .catalog {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-column-gap: 80px;
       }
     </style>
   </head>
@@ -50,6 +68,16 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
         <a class="navbar-brand" href="/">Каталог одежды</a>
+
+        <button
+          id="show-add-dialog"
+          class="btn btn-sm btn-outline-secondary"
+          type="button"
+          data-bs-toggle="modal"
+          data-bs-target="#addItemModal"
+        >
+          Добавить
+        </button>
       </div>
     </nav>
 
@@ -97,6 +125,120 @@
       <div id="catalog"></div>
     </div>
 
+    <div class="modal" tabindex="-1" id="addItemModal">
+      <form action="/add" method="POST" enctype="multipart/form-data">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Добавление одежды в каталог</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="item-name">Название</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="item-name"
+                  name="item-name"
+                />
+              </div>
+              <div class="form-group">
+                <label for="item-name">Описание</label>
+                <textarea
+                  type="text"
+                  class="form-control"
+                  id="item-comment"
+                  name="item-comment"
+                  rows="2"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="item-season">Сезон</label>
+                <select
+                  class="form-control"
+                  id="item-season"
+                  name="item-season"
+                >
+                  <option value="1">Зима</option>
+                  <option value="2">Весна</option>
+                  <option value="3">Лето</option>
+                  <option value="4">Осень</option>
+                </select>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="item-gender"
+                  id="item-gender-male"
+                  value="мужской"
+                />
+                <label class="form-check-label" for="item-gender-male"
+                  >Мужская</label
+                >
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="item-gender"
+                  id="item-gender-female"
+                  value="женская"
+                />
+                <label class="form-check-label" for="item-gender-female"
+                  >Женская</label
+                >
+              </div>
+              <div class="form-group">
+                <label for="item-season">Тип</label>
+                <select
+                  class="form-control"
+                  id="item-clothes"
+                  name="item-clothes"
+                >
+                  <option>Куртка</option>
+                  <option>Брюки</option>
+                  <option>Джинсы</option>
+                  <option>Футболка</option>
+                  <option>Свитер</option>
+                  <option>Пиджак</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="item-image">Изображение</label>
+                <input
+                  type="file"
+                  class="form-control-file"
+                  id="item-image"
+                  name="item-image"
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                data-dismiss="modal"
+              >
+                Закрыть
+              </button>
+              <button id="add-item" type="submit" class="btn btn-primary">
+                Добавить
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
     <script
       src="https://code.jquery.com/jquery-3.6.0.min.js"
       integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
@@ -126,9 +268,37 @@
         $('#catalog').load('/catalog?' + $.param(filter));
       }
 
+      function addItem() {
+        var modal = new bootstrap.Modal(
+          document.getElementById('addItemModal'),
+          {
+            keyboard: false,
+          }
+        );
+        modal.hide();
+      }
+
+      function showAddDialog() {
+        var modal = new bootstrap.Modal(
+          document.getElementById('addItemModal'),
+          {
+            keyboard: false,
+          }
+        );
+        modal.show();
+      }
+
+      function delItem() {
+        var id = $(this).data('id');
+        $.post('/del', { id: id }).done(refresh);
+      }
+
       $(document).ready(function () {
         $(document).on('click', '.filter_season', refresh);
         $(document).on('click', '.filter_gender', refresh);
+        $(document).on('click', '.cart-del', delItem);
+        $('#add-item').click(addItem);
+        $('#show-add-dialog').click(showAddDialog);
 
         refresh();
       });
